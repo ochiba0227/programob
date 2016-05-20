@@ -19,6 +19,20 @@ block content
   div(ng-app="spicyApp1" ng-controller="SpicyCtrl")
     input(ng-model="spice")
     The food is {{spice}} spicy!
-      
+    table(st-table="rowCollection" class="table table-striped")
+      thead
+        tr
+          th First name
+          th last name
+          th birth date
+          th balance
+          th email
+      tbody
+        tr(ng-repeat="row in rowCollection")
+          td {{row.firstName}}
+          td {{row.lastName}}
+          td {{row.birthDate}}
+          td {{row.balance}}
+          td {{row.email}}
 block scripts
   script(src='/javascripts/index.js')
