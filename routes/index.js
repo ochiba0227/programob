@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
-var mongoose = require('mongoose');
-var db = mongoose.connect('mongodb://localhost/firstapp');
+var global_var = require('./var.js');
+var db = global_var.getDB();
 
 // ToDoスキーマを定義する
 var Schema = db.Schema;
@@ -28,7 +28,7 @@ router.post('/todo', function(req, res) {
   console.log("inininininin");
   var name = req.body.name;
   var limit = req.body.limit;
-  // ToDoの名前と期限のパラーメタがあればMongoDBに保存
+  // ToDoの名前と期限のパラーメタがあればMongodbに保存
   console.log("inininininin");
   if(name && limit) {
     var Todo = db.model('Todo');
