@@ -1,6 +1,7 @@
-var myApp = angular.module('spicyApp1', ['ui.bootstrap']);
-myApp.controller('SpicyCtrl', ['$scope', function($scope){
+var spicyApp1 = angular.module('spicyApp1', ['ui.bootstrap'])
+.controller('SpicyCtrl', function($scope, $modal) {
     $scope.spice = 'very';
+    $scope.spi = 've';
     $scope.chiliSpicy = function() {
         $scope.spice = 'chili';
     };
@@ -14,5 +15,8 @@ myApp.controller('SpicyCtrl', ['$scope', function($scope){
     ];
     $scope.methodA = function(index) {
       console.log(index);
+      $modal.open({
+        template: '<div class="md">モーダルだよ</div>'
+      });
     };
-}]);
+});
