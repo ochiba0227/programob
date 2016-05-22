@@ -1,5 +1,12 @@
 {
     "mongodb": {
-        "url": "mongodb://localhost/firstapp"
+        "url": "mongodb://localhost/firstapp",
+        "schemaName":{
+          "competiton":"competition",
+          "program":"program",
+          "entry":"entry",
+          "record":"record",
+          "user":"user"
+        }
     }
 }
