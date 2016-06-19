@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var global_var = require('./var.js');
 var competition = global_var.getCompetitionModel();
+var program = global_var.getProgramModel();
 var entry = global_var.getEntryModel();
 
   //   var makeCompetition = new competition();
@@ -33,9 +34,19 @@ router.post('/', function(req, res, next) {
 
 router.get('/program', function(req, res, next) {
   var id = req.query.id
-  competition.findOne({_id:id}, function(err, comp) {
+  program.find({competitionId:id}, function(err, comp) {
+    console.log("comocmomcomcomoc")
+    console.log(id)
+    console.log(comp)
     res.json(comp);
   });
+});
+router.post('/program', function(req, res, next) {
+  console.log("pospoppopopppooppopoop")
+  console.log(req.body)
+  var makeProgram = new program(req.body);
+  makeProgram.save();
+  res.json({});
 });
 
 module.exports = router;

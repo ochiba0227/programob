@@ -7,21 +7,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/program', function(req, res, next) {
-  console.log(req.query)
-  var resParent=res;
-  request.get(
-    {
-      url:'http://' + req.headers.host + '/db/program',
-      qs:req.query},
-    function (err, res, body) {
-        if (!err && res.statusCode == 200) {
-            var data = JSON.parse(res.body)
-            resParent.render('admin/program', { title: data.title });
-        } else {
-          console.log("エラー！！！");
-        }
-    }
-  );
+  res.render('admin/program', { title: req.query.title, id:req.query.id });
 });
 
 module.exports = router;

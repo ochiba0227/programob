@@ -13,7 +13,6 @@ var spicyApp1 = angular.module('spicyApp1', ['ui.bootstrap'])
   };
 
   $scope.addCompetiton = function() {
-    console.log("ASFDASFAS")
     $http({
       method: 'POST',
       url: 'db',
@@ -38,7 +37,7 @@ var spicyApp1 = angular.module('spicyApp1', ['ui.bootstrap'])
 
   $scope.showProgram = function(index) {
     console.log(index);
-    $window.location.href = '/admin/program' + '?id=' + index._id;
+    $window.location.href = '/admin/program' + '?id=' + index._id + '&title=' + index.title;
   };
 
   //試合データの取得
