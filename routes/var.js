@@ -65,7 +65,16 @@ module.exports = {
     getCompetitionModel: function(){
       return competitionModel
     },
+    getProgramModel: function(){
+      return programModel
+    },
     getEntryModel: function(){
       return entryModel
+    },
+    getRecordModel: function(){
+      return recordModel
+    },
+    getUserModel: function(){
+      return userModel
     }
 }

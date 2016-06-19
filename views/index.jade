@@ -4,7 +4,7 @@ block content
   div(class="container")
     h2 試合リスト
     div(ng-app="spicyApp1" ng-controller="SpicyCtrl")
-      form(class="form-inline")
+      form(id="spicyForm" class="form-inline")
         div(class="form-group")
           label(for="exampleInputName2") The food is {{spice}} spicy!
           input(type="text" class="form-control" id="exampleInputName2" ng-model="spice")
@@ -23,12 +23,9 @@ block content
               th balance
               th email
           tbody
-            tr(ng-repeat="row in rowCollection" ng-click="methodA(row)")
-              td {{row.firstName}}
-              td {{row.lastName}}
-              td {{row.birthDate}}
-              td {{row.balance}}
-              td {{row.email}}
+            tr(ng-repeat="row in rowCollection| filter:spi" ng-click="showProgram(row)")
+              td {{row.title}}
+              td {{row.day}}
 block scripts
-  script(src='/controllers/indexController.js')
   script(src='/javascripts/index.js')
+  script(src='/controllers/indexController.js')

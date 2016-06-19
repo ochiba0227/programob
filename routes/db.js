@@ -19,13 +19,23 @@ var entry = global_var.getEntryModel();
     //   console.log(comp[1].entryData.userId[1]);
     // });
 
-/* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  competition.find({}, function(err, comp) {
+    res.json(comp);
+  });
+});
+router.post('/', function(req, res, next) {
+  console.log(req.body)
+  var makeCompetition = new competition(req.body);
+  makeCompetition.save();
+  res.json({});
 });
 
 router.get('/program', function(req, res, next) {
-  res.render('admin', { id: req.query.id });
+  var id = req.query.id
+  competition.findOne({_id:id}, function(err, comp) {
+    res.json(comp);
+  });
 });
 
 module.exports = router;

@@ -1,11 +1,17 @@
-// ページが表示されたときToDoリストを表示する
+var testvalue = "testvalue"
 $(function(){
-  console.log("ASDFASDFAS")
+    // /todoにPOSTアクセスする
+    $.post('/program', {name: 131, limit: 12123}, function(res){
+      console.log(res);
+      alert("AAAAA");
+      //再度表示する
+      //getList();
+    });
   getList();
 });
 
 // フォームを送信ボタンを押すと、ToDoを追加して再表示する。
-$('#form').submit(function(){
+$('#spicyForm').submit(function(){
   postList();
   return false;
 });
@@ -33,13 +39,14 @@ function getList(){
 
 // フォームに入力されたToDoを追加する
 function postList(){
+  console.log("AAAA")
   // フォームに入力された値を取得
-  var name = $('#text').val();
+  var name = $('#exampleInputName2').val();
   var limitDate = new Date();
 
   //入力項目を空にする
-  $('#text').val('');
-  $('#limit').val('');
+  $('#exampleInputName2').val('');
+  $('#exampleInputName3').val('');
   alert(name);
   alert(limitDate);
 
