@@ -64,6 +64,7 @@ router.get('/user', function(req, res, next) {
 });
 router.post('/user', function(req, res, next) {
   var makeUser = new user(req.body);
+  console.log(req.body)
   makeUser.save();
   res.json({});
 });

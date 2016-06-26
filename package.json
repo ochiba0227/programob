@@ -8,6 +8,7 @@
   "dependencies": {
     "angular": "^1.5.5",
     "angular-bootstrap": "^0.12.2",
+    "angular-i18n": "^1.5.7",
     "angular-smart-table": "^2.1.8",
     "body-parser": "~1.13.2",
     "bootstrap": "^3.3.6",

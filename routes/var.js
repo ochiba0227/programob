@@ -54,6 +54,7 @@ var recordModel = db.model(conf.mongodb.schemaName.record, recordSchema);
 // ユーザ
 var userSchema = new Schema({
   userId   : Number,                              //user固有のid
+  userName : String,                              //名前
   department : String,                             //学科(M,E,S,I,C)
   graduateYear : Date,                             //卒業(見込み)年度
   createdDate : {type: Date, default: Date.now},  //作成日
