@@ -12,7 +12,7 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
     $scope.datePickerOpen = !$scope.datePickerOpen;
   };
 
-  $scope.addCompetiton = function() {
+  $scope.addProgram = function() {
     $http({
       method: 'POST',
       url: '/db/program',
@@ -40,8 +40,8 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
 
 
   $scope.showEntry = function(index) {
-    console.log(index);
-    $window.location.href = '/admin/entry' + '?id=' + index._id;
+    var title = encodeURIComponent('No.'+index.programNum+' '+index.title);
+    $window.location.href = '/admin/entry' + '?id=' + index._id + '&title=' + title;
   };
 
   //試合データの取得
@@ -51,10 +51,9 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
       url: '/db/program',
       params: {id:competitionId} //req.queryにデータを渡すとき
     }).then(function successCallback(response) {
-      console.log(response.data)
       $scope.rowCollection = response.data;
     }, function errorCallback(response) {
-      alert("サーバエラーです"+response.data)
+      alert("showProgramサーバエラーです"+response.data)
     });
   }
   $scope.showProgram();

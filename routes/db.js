@@ -4,21 +4,7 @@ var global_var = require('./var.js');
 var competition = global_var.getCompetitionModel();
 var program = global_var.getProgramModel();
 var entry = global_var.getEntryModel();
-
-  //   var makeCompetition = new competition();
-  //   makeCompetition.title = "test_third";
-  //   makeCompetition.save();
-  //   // console.log(makeCompetition)
-  //     competition.find({}, function(err, comp) {
-  //   console.log(comp);
-  // });
-    //   var makeEntry = new entry();
-    //   makeEntry.programId = "test_third";
-    //   makeEntry.entryData.userId=["aa","bb","cc"];
-    //   makeEntry.save();
-    //     entry.find({}, function(err, comp) {
-    //   console.log(comp[1].entryData.userId[1]);
-    // });
+var user = global_var.getUserModel();
 
 router.get('/', function(req, res, next) {
   competition.find({}, function(err, comp) {
@@ -26,26 +12,59 @@ router.get('/', function(req, res, next) {
   });
 });
 router.post('/', function(req, res, next) {
-  console.log(req.body)
   var makeCompetition = new competition(req.body);
   makeCompetition.save();
   res.json({});
 });
 
 router.get('/program', function(req, res, next) {
-  var id = req.query.id
+  var id = req.query.id;
   program.find({competitionId:id}, function(err, comp) {
-    console.log("comocmomcomcomoc")
-    console.log(id)
-    console.log(comp)
     res.json(comp);
   });
 });
 router.post('/program', function(req, res, next) {
-  console.log("pospoppopopppooppopoop")
-  console.log(req.body)
-  var makeProgram = new program(req.body);
-  makeProgram.save();
+  var competitionId = req.body.competitionId;
+  program.count({competitionId:competitionId}, function(err, num) {
+    if(err!=null){
+      res.json({err:err});
+      next(err);
+    }
+    var makeProgram = new program(req.body);
+    makeProgram.programNum = num+1;
+    makeProgram.save();
+    res.json({});
+  });
+});
+
+router.get('/entry', function(req, res, next) {
+  var id = req.query.id
+  entry.find({programId:id}, function(err, ent) {
+    res.json(ent);
+  });
+});
+router.post('/entry', function(req, res, next) {
+  var makeEntry = new entry(req.body);
+  makeEntry.save();
+  res.json({});
+});
+
+router.get('/user', function(req, res, next) {
+  var id = req.query.id
+  if(id!=null){
+    user.find({userId:id}, function(err, usr) {
+      res.json(usr);
+    });
+  }
+  else{
+    user.find({}, function(err, usr) {
+      res.json(usr);
+    });
+  }
+});
+router.post('/user', function(req, res, next) {
+  var makeUser = new user(req.body);
+  makeUser.save();
   res.json({});
 });
 
