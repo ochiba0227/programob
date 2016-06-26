@@ -11,7 +11,7 @@ router.get('/program', function(req, res, next) {
 });
 
 router.get('/entry', function(req, res, next) {
-  res.render('admin/entry', { title: req.query.title, id:req.query.id });
+  res.render('admin/entry', { title: req.query.title, id:req.query.id, isRelay:req.query.isRelay });
 });
 
 router.get('/user', function(req, res, next) {

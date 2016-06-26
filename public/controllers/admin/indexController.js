@@ -19,7 +19,7 @@ var spicyApp1 = angular.module('spicyApp1', ['ui.bootstrap'])
       data: {
         title: $scope.competitionTitle,
         description: $scope.competitionDescription,
-        day: $scope.competitionDate
+        day: $scope.competitionDate+$scope.competitionDate.getTimezoneOffset() //日本時間に変換
       }
     }).then(function successCallback(response) {
       $scope.competitionTitle = '';

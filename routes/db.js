@@ -52,7 +52,18 @@ router.post('/entry', function(req, res, next) {
 router.get('/user', function(req, res, next) {
   var id = req.query.id
   if(id!=null){
-    user.find({userId:id}, function(err, usr) {
+    var query = null;
+    if(Array.isArray(id)){
+      var queryId = []
+      id.forEach(function(i){
+        queryId.push({_id:i});
+      });
+      query = { $or: queryId };
+    }
+    else{
+      query = {_id:id}
+    }
+    user.find(query, function(err, usr) {
       res.json(usr);
     });
   }
@@ -64,7 +75,6 @@ router.get('/user', function(req, res, next) {
 });
 router.post('/user', function(req, res, next) {
   var makeUser = new user(req.body);
-  console.log(req.body)
   makeUser.save();
   res.json({});
 });

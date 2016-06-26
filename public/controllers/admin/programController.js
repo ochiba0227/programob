@@ -41,7 +41,7 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
 
   $scope.showEntry = function(index) {
     var title = encodeURIComponent('No.'+index.programNum+' '+index.title);
-    $window.location.href = '/admin/entry' + '?id=' + index._id + '&title=' + title;
+    $window.location.href = '/admin/entry' + '?id=' + index._id + '&title=' + title + '&isRelay=' + index.isRelay;
   };
 
   //試合データの取得

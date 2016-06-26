@@ -15,9 +15,9 @@ block content
               option(value="") -選択してください-
           div(class="form-group")
             label(for="graduateYear") 卒業（見込み）年度
-            input(type="text" class="form-control" id="graduateYear" ng-model="graduateYear" datepicker-mode="'year'" datepicker-options="{{dateOptions}}" datepicker-popup="yyyy" is-open="datePickerOpen" required ng-click="toggleDatePicker($event)")
-            div(class="input-group-addon" ng-click="toggleDatePicker($event)")
-              i(class="glyphicon glyphicon-calendar")
+            div(class="input-group")
+              input(type="text" class="form-control" id="graduateYear" ng-model="graduateYear" datepicker-mode="'year'" datepicker-options="{{dateOptions}}" datepicker-popup="yyyy" is-open="datePickerOpen" required ng-click="toggleDatePicker($event)")
+              span(class="input-group-addon glyphicon glyphicon-calendar" ng-click="toggleDatePicker($event)")
           button(type="submit" class="btn btn-primary") ユーザを追加する
     
     div(class="row")

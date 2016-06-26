@@ -8,15 +8,15 @@ block content
         form(id="spicyForm" ng-submit="addCompetiton()")
           div(class="form-group")
             label(for="competitionTitle") 試合タイトル
-            input(type="text" class="form-control" id="competitionTitle" ng-model="competitionTitle")
+            input(type="text" class="form-control" id="competitionTitle" ng-model="competitionTitle" required)
           div(class="form-group")
             label(for="competitionDescription") 試合説明
             input(type="text" class="form-control" id="competitionDescription" ng-model="competitionDescription")
           div(class="form-group")
             label(for="competitonDate") 開催日
-            input(type="text" class="form-control" id="competitonDate" ng-model="competitionDate" datepicker-popup is-open="datePickerOpen")
-            div(class="input-group-addon" ng-click="toggleDatePicker($event)")
-              i(class="glyphicon glyphicon-calendar")
+            div(class="input-group")
+              input(type="text" class="form-control" id="competitonDate" ng-model="competitionDate" datepicker-popup is-open="datePickerOpen" ng-click="toggleDatePicker($event)" required)
+              span(class="input-group-addon glyphicon glyphicon-calendar" ng-click="toggleDatePicker($event)")
           button(type="submit" class="btn btn-primary") 試合を追加する
     
     div(class="row")
