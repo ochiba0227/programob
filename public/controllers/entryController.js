@@ -1,5 +1,5 @@
 var entryApp = angular.module('entryApp', ['ui.bootstrap'])
-.controller('entryController', function($scope, $modal, $http, $window) {
+.controller('entryController', function($scope, $modal, $http, $window, $q) {
   $scope.rowCollection = [];
 
   $scope.users = [];
@@ -88,18 +88,26 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
       url: '/db/entry',
       params:{id:programId}
     }).then(function successCallback(response) {
+      var requestPromise = [];
       $scope.rowCollection = [];
       $.each(response.data,function(i){
-        $http({
+        var httpPromise = $http({
           method: 'GET',
           url: '/db/user',
           params: {id:response.data[i].entryData.userId}
         }).then(function successCallback(responseUser) {
           response.data[i].entryData.userData = responseUser.data;
-          response.data[i].entryData.entryTime = $scope.formatDate(response.data[i].entryData.entryTime);
           $scope.rowCollection.push(response.data[i]);
         }, function errorCallback(response) {
           alert("サーバエラーです")
+        });
+        requestPromise.push(httpPromise);
+      });
+      $q.all(requestPromise).then(function() {
+        $scope.rowCollection.sort(function(a,b){
+          if( a.entryData.entryTime < b.entryData.entryTime ) return -1;
+          if( a.entryData.entryTime > b.entryData.entryTime ) return 1;
+          return 0;
         });
       });
     }, function errorCallback(response) {

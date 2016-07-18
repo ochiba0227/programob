@@ -8,14 +8,27 @@ html(lang="ja")
     script(src='/jquery/dist/jquery.min.js')
     script(src='/bootstrap/dist/js/bootstrap.min.js')
     script(src='/angular/angular.min.js')
+    script(src='/angular-i18n/angular-locale_ja-jp.js')
     script(src='/angular-bootstrap/ui-bootstrap-tpls.js')
     script(src='/angular-smart-table/index.js')
     
   body
     header
-      nav(class="navbar navbar-default navbar-fixed-top")
-        div(class="container")
-          div(class="navbar-header")
-            a(class="navbar-brand" href="/") 水泳大会
+      if isAdmin
+        nav(class="navbar navbar-default navbar-fixed-top")
+          div(class="container")
+            div(class="navbar-header")
+              a(class="navbar-brand" href="/admin") 水泳大会-admin
+            div(class="navbar-collapse collapse" id="navbar-main")
+              ul(class="nav navbar-nav")
+                li
+                  a(href="/admin") 試合の追加
+                li 
+                  a(href="/admin/user") ユーザの追加
+      else
+        nav(class="navbar navbar-default navbar-fixed-top")
+          div(class="container")
+            div(class="navbar-header")
+              a(class="navbar-brand" href="/") 水泳大会
     block content
     block scripts

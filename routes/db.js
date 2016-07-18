@@ -51,6 +51,7 @@ router.post('/entry', function(req, res, next) {
 
 router.get('/user', function(req, res, next) {
   var id = req.query.id
+  console.log(id)
   if(id!=null){
     var query = null;
     if(Array.isArray(id)){

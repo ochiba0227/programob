@@ -3,15 +3,15 @@ var request = require('request');
 var router = express.Router();
 
 router.get('/', function(req, res, next) {
-  res.render('admin/index', {});
+  res.render('index', {isAdmin:true});
 });
 
 router.get('/program', function(req, res, next) {
-  res.render('admin/program', { title: req.query.title, id:req.query.id });
+  res.render('program', { title: req.query.title, id:req.query.id, isAdmin:true});
 });
 
 router.get('/entry', function(req, res, next) {
-  res.render('admin/entry', { title: req.query.title, id:req.query.id, isRelay:req.query.isRelay });
+  res.render('entry', { title: req.query.title, id:req.query.id, isRelay:req.query.isRelay, isAdmin:true});
 });
 
 router.get('/user', function(req, res, next) {

@@ -1,31 +1,40 @@
 extends layout
 
 block content
-  div(class="container")
+  div(ng-app="indexApp" ng-controller="indexController" class="container")
     h2 試合リスト
-    div(ng-app="spicyApp1" ng-controller="SpicyCtrl")
-      form(id="spicyForm" class="form-inline")
-        div(class="form-group")
-          label(for="exampleInputName2") The food is {{spice}} spicy!
-          input(type="text" class="form-control" id="exampleInputName2" ng-model="spice")
-        div(class="form-group")
-          label The food is {{spi}} spicy!
-          input(type="text" class="form-control" id="exampleInputName3" ng-model="spi")
-        button(type="submit" class="btn btn-primary") Send invitations
-      
-      div(class="table-responsive")
-        table(st-table="rowCollection" class="table table-striped table-bordered table-hover")
-          thead
-            tr
-              th First name
-              th last name
-              th birth date
-              th balance
-              th email
-          tbody
-            tr(ng-repeat="row in rowCollection| filter:spi" ng-click="showProgram(row)")
-              td {{row.title}}
-              td {{row.day}}
+    if isAdmin
+      div(class="row")
+        div(class="col-lg-12")
+          form(id="spicyForm" ng-submit="addCompetiton()")
+            div(class="form-group")
+              label(for="competitionTitle") 試合タイトル
+              input(type="text" class="form-control" id="competitionTitle" ng-model="competitionTitle" required)
+            div(class="form-group")
+              label(for="competitionDescription") 試合説明
+              input(type="text" class="form-control" id="competitionDescription" ng-model="competitionDescription")
+            div(class="form-group")
+              label(for="competitonDate") 開催日
+              div(class="input-group")
+                input(type="text" class="form-control" id="competitonDate" ng-model="competitionDate" datepicker-popup is-open="datePickerOpen" ng-click="toggleDatePicker($event)" required)
+                span(class="input-group-addon glyphicon glyphicon-calendar" ng-click="toggleDatePicker($event)")
+            button(type="submit" class="btn btn-primary") 試合を追加する
+    
+    div(class="row")
+      div(class="col-lg-12")
+        input(type="text" class="form-control" id="exampleInputName3" ng-model="filter")
+        div(class="table-responsive")
+          table(st-table="rowCollection" class="table table-striped table-bordered table-hover")
+            thead
+              tr
+                th 試合名
+                th 開催日
+            tbody
+              tr(ng-repeat="row in rowCollection| filter:filter" ng-click="showProgram(row)")
+                td {{row.title}}
+                td {{row.day}}
 block scripts
-  script(src='/javascripts/index.js')
+  script.
+    //nullならfalse なんか文字が入っていたらtrue
+    var isAdmin = Boolean("#{isAdmin}");
   script(src='/controllers/indexController.js')

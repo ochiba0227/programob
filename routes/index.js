@@ -21,11 +21,15 @@ var entry = global_var.getEntryModel();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('index', {});
 });
 
 router.get('/program', function(req, res, next) {
-  res.render('admin', { id: req.query.id });
+  res.render('program', { title: req.query.title, id:req.query.id});
+});
+
+router.get('/entry', function(req, res, next) {
+  res.render('showentry', { title: req.query.title, id:req.query.id, isRelay:req.query.isRelay});
 });
 
 module.exports = router;
