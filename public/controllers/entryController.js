@@ -2,6 +2,9 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
 .controller('entryController', function($scope, $modal, $http, $window, $q) {
   $scope.rowCollection = [];
 
+  //使用するコース数
+  $scope.courseNum = 6;
+
   $scope.users = [];
   $scope.entryTime = '';
 
@@ -79,7 +82,7 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
     second = ('0' + date.getSeconds()).slice(-2);
     milliSecond = ('00' + date.getMilliseconds()).slice(-3);
     return minute+':'+second+'.'+milliSecond;
-};
+  };
 
   //エントリーデータの取得
   $scope.showEntry = function() {
@@ -104,15 +107,47 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
         requestPromise.push(httpPromise);
       });
       $q.all(requestPromise).then(function() {
-        $scope.rowCollection.sort(function(a,b){
-          if( a.entryData.entryTime < b.entryData.entryTime ) return -1;
-          if( a.entryData.entryTime > b.entryData.entryTime ) return 1;
-          return 0;
-        });
+        if(!isAdmin){
+          $scope.makeClass();
+        }
       });
     }, function errorCallback(response) {
       alert("サーバエラーです"+response.data)
     });
+  }
+
+  //組分け
+  $scope.makeClass = function() {
+    //タイム昇順ソート
+    $scope.rowCollection.sort(function(a,b){
+      if( a.entryData.entryTime < b.entryData.entryTime ) return -1;
+      if( a.entryData.entryTime > b.entryData.entryTime ) return 1;
+      return 0;
+    });
+
+    $scope.entryRows = [];
+    var classNum = 0;
+    var indexes = [2,3,1,4,0,5];
+    var length = $scope.rowCollection.length;
+
+    while(length!=0){
+      var loopNum = $scope.courseNum;
+      $scope.entryRows[classNum]=new Array(6);
+      // 普通にやると1組が3人未満になってしまう場合を考慮
+      if(length/$scope.courseNum>1&&length/$scope.courseNum<2){
+        var mod = length%$scope.courseNum;
+        if(mod<=2){
+          loopNum = $scope.courseNum-(3-mod);
+        }
+      }
+      for(var i = 0; i<loopNum; i++){
+        $scope.entryRows[classNum][indexes[i]] = $scope.rowCollection[0];
+        $scope.rowCollection.shift();
+      }
+      classNum+=1;
+      length = $scope.rowCollection.length;
+      console.log($scope.entryRows)
+    }
   }
 
   //ユーザの取得

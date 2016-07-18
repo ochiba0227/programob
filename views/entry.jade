@@ -28,9 +28,10 @@ block content
               tr(ng-repeat="row in rowCollection| filter:filterInput")
                 td
                   span(ng-repeat="uid in row.entryData.userData") {{uid.userName}} 
-                td {{row.entryData.entryTime}}
+                td {{formatDate(row.entryData.entryTime)}}
 block scripts
   script.
     var programId = "#{id}";
     var isRelay = "#{isRelay}";
+    var isAdmin = Boolean("#{isAdmin}");
   script(src='/controllers/entryController.js')
