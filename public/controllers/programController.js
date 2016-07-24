@@ -144,7 +144,7 @@ $(function(){
               + "," + getOBYear(this.entryData.graduateYear) + "," + this.entryData.department +"\n";
             }
             else{
-              content += (k+1)+":\n";
+              content += (k+1)+",\n";
             }
           });
         });
