@@ -2,9 +2,16 @@ extends layout
 
 block content
   div(ng-app="programApp" ng-controller="programController" class="container")
-    h2 #{title}
+    h2 #{title} 
     if isAdmin
-      div(class="row")
+      div(class="row")          
+        div(class="col-lg-6")
+          span csvファイルからプログラムを追加
+            input(type="file" id="csvFile")
+        div(class="col-lg-6")
+          span tsvファイルからエントリーを追加
+            input(type="file" id="tsvFile")
+      div(class="row")          
         div(class="col-lg-12")
           form(id="programForm" ng-submit="addProgram()")
             div(class="form-group")

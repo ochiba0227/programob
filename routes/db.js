@@ -51,8 +51,10 @@ router.post('/entry', function(req, res, next) {
     });
   }
   else{
+    console.log(req.body)
     var makeEntry = new entry(req.body);
     makeEntry.save();
+    res.json({});
   }
 });
 
@@ -69,8 +71,10 @@ router.post('/record', function(req, res, next) {
 });
 
 router.get('/user', function(req, res, next) {
+  // nodeがつけてくれるほうのid
   var id = req.query.id
-  console.log(id)
+  // 自分がつけるid
+  var uid = req.query.uid;
   if(id!=null){
     var query = null;
     if(Array.isArray(id)){
@@ -84,6 +88,11 @@ router.get('/user', function(req, res, next) {
       query = {_id:id}
     }
     user.find(query, function(err, usr) {
+      res.json(usr);
+    });
+  }
+  else if(uid!=null){
+    user.find({userId:uid}, function(err, usr) {
       res.json(usr);
     });
   }

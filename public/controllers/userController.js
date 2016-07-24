@@ -3,6 +3,8 @@ var userApp = angular.module('userApp', ['ui.bootstrap'])
   $scope.rowCollection = [];
 
   $scope.userName = '';
+  $scope.sex = '';
+  $scope.sexList = ['M','F'];
   $scope.department = '';
   $scope.departments = ['M','E','S','I','C'];
   $scope.graduateYear = '';
@@ -25,11 +27,13 @@ var userApp = angular.module('userApp', ['ui.bootstrap'])
       url: '/db/user',
       data: {
         userName: $scope.userName,
+        sex: $scope.sex,
         department: $scope.department,
         graduateYear: $scope.graduateYear+$scope.graduateYear.getTimezoneOffset() //日本時間に変換
       }
     }).then(function successCallback(response) {
       $scope.userName = '';
+      $scope.sex = '';
       $scope.department = '';
       $scope.graduateYear = '';
       $scope.showUser();

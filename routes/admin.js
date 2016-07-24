@@ -15,7 +15,7 @@ router.get('/entry', function(req, res, next) {
 });
 
 router.get('/user', function(req, res, next) {
-  res.render('admin/user', {});
+  res.render('user', {isAdmin:true});
 });
 
 module.exports = router;

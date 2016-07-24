@@ -140,10 +140,11 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
       var requestPromise = [];
       $scope.rowCollection = [];
       $.each(response.data,function(i){
+        console.log(this)
         var httpPromise = $http({
           method: 'GET',
           url: '/db/user',
-          params: {id:response.data[i].entryData.userId}
+          params: {uid:response.data[i].entryData.userId}
         }).then(function successCallback(responseUser) {
           response.data[i].entryData.userData = responseUser.data;
           $scope.rowCollection.push(response.data[i]);

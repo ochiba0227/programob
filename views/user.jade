@@ -10,6 +10,10 @@ block content
             label(for="userName") ユーザ名
             input(type="text" class="form-control" id="userName" ng-model="userName" required)
           div(class="form-group")
+            label(for="department") 性別
+            select(class="form-control" id="sex" ng-model="sex" ng-options="s for s in sexList" required)
+              option(value="") -選択してください-
+          div(class="form-group")
             label(for="department") 学科
             select(class="form-control" id="department" ng-model="department" ng-options="d for d in departments" required)
               option(value="") -選択してください-
@@ -27,13 +31,17 @@ block content
           table(st-table="rowCollection" class="table table-striped table-bordered table-hover")
             thead
               tr
+                th ユーザID
                 th ユーザ名
+                th 性別
                 th 学科
                 th 卒業（見込み）年度
             tbody
               tr(ng-repeat="row in rowCollection| filter:filter")
+                td {{row.userId}}
                 td {{row.userName}}
+                td {{row.sex}}
                 td {{row.department}}
                 td {{row.graduateYear}}
 block scripts
-  script(src='/controllers/admin/userController.js')
+  script(src='/controllers/userController.js')
