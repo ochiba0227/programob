@@ -1,3 +1,52 @@
+  // 現役の学年
+  var activeYear = 3;
+  var obStartYear = 5-activeYear;
+
+// OBならOB何年目か、現役なら現役何年目か返す
+function getOBYear(date) {
+  var thisYear = getJSTDate(new Date());
+  var graduateYear = new Date(date);
+
+  var retText;
+  var yearNum;
+// console.log(thisYear.getFullYear(),graduateYear.getFullYear());
+  if(isOB(thisYear,graduateYear)){
+    yearNum = thisYear.getFullYear() - graduateYear.getFullYear() + obStartYear;
+    retText = "OB " + yearNum.toString();
+  }
+  else{
+    yearNum = 5 - (graduateYear.getFullYear() - thisYear.getFullYear());
+    retText = "現 " + yearNum.toString();
+  }
+  // console.log(yearNum);
+  // console.log(retText);
+  return retText;
+}
+
+// OBかどうか判定する
+function isOB(thisYear,graduateYear) {
+  // 3年生までが現役？
+  if(thisYear.getFullYear()+obStartYear-1<graduateYear.getFullYear()){
+    return false;
+  }
+  return true;
+}
+
+// dateを表示用フォーマットにあったstrに
+function dateToFormatStr(date) {
+  if(date==null){
+    return null;
+  }
+  date = new Date(date);
+  minute = (date.getHours()-9)*60 + date.getMinutes();
+  second = ('0' + date.getSeconds()).slice(-2);
+  milliSecond = (date.getMilliseconds()+'00').slice(0,3);
+
+  if(minute!=0){
+    return minute+':'+second+'.'+milliSecond;
+  }
+  return second+'.'+milliSecond;
+};
 
   function timeStrToDate(str){
     if(str==null){
@@ -6,6 +55,7 @@
     return makeTime(str.match(/^(\d{1,3}):(\d{1,2}).(\d{1,3})$|^(\d{1,2}).(\d{1,3})$|^(\d{1,2})$/));
   }
 
+  // フォーマットからdateを作成
   function makeTime(entryTime){
     if(entryTime==null){
       return null;

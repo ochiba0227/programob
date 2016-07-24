@@ -114,34 +114,38 @@ $(function(){
         url: '/db/entry',
         data: "id="+this._id //req.queryにデータを渡すとき
       }).done(function(entries) {
-        startList.push(getStartList(entries));
+        $.each(entries,function(i){
+          $.ajax({
+            method: 'GET',
+            url: '/db/user',
+            data: "uid="+this.entryData.userId
+          }).done(function(ret){
+            ret[0]["entryTime"] = entries[i].entryData.entryTime;
+            ret[0]["obYear"] = getOBYear(ret[0].graduateYear)
+            entries[i].entryData=ret[0];
+          });
+        });
+        startList.push(entries);
       });
     });
     // 通信が全部終わったらcsvへ書き出し
-    $(document).ajaxStop(function () {
+    $(document).ajaxStop(function (e) {
       var content = '';
       $.each(startList,function(i){
-        console.log(programs[i].distance+"m "+programs[i].title)
+        // console.log(programs[i].distance+"m "+programs[i].title)
         content += programs[i].distance+"m "+programs[i].title + "\n";
-        $.each(this.reverse(),function(j){
-          console.log((j+1)+"組")
+        $.each(getStartList(this).reverse(),function(j){
+          // console.log((j+1)+"組")
           content += (j+1)+"組\n";
           $.each(this,function(k){
-            console.log(this)
-            // getUserName(this).done(function(ret){
-            //   // console.log("donedone")
-            //   content += (k+1)+":"+ret.userName+"\n";
-            // }).fail(function(ret){
-            //   // console.log("fafafafafa")
-            //   content += (k+1)+":\n";
-            //
-            // });
-            // if(typeof this.entryData!=="undefined"){
-            //   content += (k+1)+":"+this.entryData.userId+"\n";
-            // }
-            // else{
-            //   content += (k+1)+":\n";
-            // }
+            // console.log(this.entryData)
+            if(typeof this.entryData!=="undefined"){
+              content += (k+1)+","+this.entryData.userName+","+dateToFormatStr(this.entryData.entryTime)
+              + "," + getOBYear(this.entryData.graduateYear) + "," + this.entryData.department +"\n";
+            }
+            else{
+              content += (k+1)+":\n";
+            }
           });
         });
       });
@@ -152,6 +156,7 @@ $(function(){
           // msSaveOrOpenBlobの場合はファイルを保存せずに開ける
           window.navigator.msSaveOrOpenBlob(blob, "test.txt");
       } else {
+          $("#download").show();
           $("#download")[0].href = window.URL.createObjectURL(blob);
       }
     });
@@ -160,7 +165,7 @@ $(function(){
   //ユーザ名の取得
   function getUserName(entry){
     var uid = null;
-    if(entry.entryData){
+    if(typeof entry.entryData!=="undefined"){
       uid = entry.entryData.userId;
     }
     return $.ajax({
