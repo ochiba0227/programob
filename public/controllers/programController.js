@@ -89,6 +89,141 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
 $(function(){
   var csvFile = $("#csvFile")[0];
   var tsvFile = $("#tsvFile")[0];
+  var exportStartList = $("#exportStartList")[0];
+
+  //スタートリストの出力
+  exportStartList.addEventListener("click",exportCSV);
+
+  //csvの出力
+  function exportCSV(){
+    $.ajax({
+      method: 'GET',
+      url: '/db/program',
+      data: "id="+competitionId //req.queryにデータを渡すとき
+    }).done(function(programs) {
+      getEntry(programs);
+    });
+  }
+
+  // エントリーを取得
+  function getEntry(programs){
+    var startList = [];
+    $.each(programs,function(){
+      $.ajax({
+        method: 'GET',
+        url: '/db/entry',
+        data: "id="+this._id //req.queryにデータを渡すとき
+      }).done(function(entries) {
+        startList.push(getStartList(entries));
+      });
+    });
+    // 通信が全部終わったらcsvへ書き出し
+    $(document).ajaxStop(function () {
+      var content = '';
+      $.each(startList,function(i){
+        console.log(programs[i].distance+"m "+programs[i].title)
+        content += programs[i].distance+"m "+programs[i].title + "\n";
+        $.each(this.reverse(),function(j){
+          console.log((j+1)+"組")
+          content += (j+1)+"組\n";
+          $.each(this,function(k){
+            console.log(this)
+            // getUserName(this).done(function(ret){
+            //   // console.log("donedone")
+            //   content += (k+1)+":"+ret.userName+"\n";
+            // }).fail(function(ret){
+            //   // console.log("fafafafafa")
+            //   content += (k+1)+":\n";
+            //
+            // });
+            // if(typeof this.entryData!=="undefined"){
+            //   content += (k+1)+":"+this.entryData.userId+"\n";
+            // }
+            // else{
+            //   content += (k+1)+":\n";
+            // }
+          });
+        });
+      });
+      var blob = new Blob([ content ], { "type" : "text/csv" });
+
+      if (window.navigator.msSaveBlob) {
+          window.navigator.msSaveBlob(blob, "test.txt");
+          // msSaveOrOpenBlobの場合はファイルを保存せずに開ける
+          window.navigator.msSaveOrOpenBlob(blob, "test.txt");
+      } else {
+          $("#download")[0].href = window.URL.createObjectURL(blob);
+      }
+    });
+  }
+
+  //ユーザ名の取得
+  function getUserName(entry){
+    var uid = null;
+    if(entry.entryData){
+      uid = entry.entryData.userId;
+    }
+    return $.ajax({
+      method: 'GET',
+      url: '/db/user',
+      data: "uid="+uid
+    });
+  }
+
+  // スタートリストの作成
+  function getStartList(entries){
+      // コース番号をどっかでまとめて設定したほうが良い
+      var courseNum = 6;
+
+      //エントリータイムが同じ場合にランダムになってしまうので、先行してid昇順ソート
+      entries.sort(function(a,b){
+        if( a._id < b._id ) return -1;
+        if( a._id > b._id ) return 1;
+        return 0;
+      });
+
+      //タイム昇順ソート
+      entries.sort(function(a,b){
+        if( a.entryData.entryTime < b.entryData.entryTime ) return -1;
+        if( a.entryData.entryTime > b.entryData.entryTime ) return 1;
+        return 0;
+      });
+
+      entryRows = [];
+      var classNum = 0;
+      var indexes = [];
+      var center = Math.floor(courseNum/2);
+      var counter = 0;
+      for(var i = 0; i<courseNum; i++){
+        if(i%2==0){
+          indexes.push(center+counter);
+        }
+        else{
+          counter++;
+          indexes.push(center-counter);
+        }
+      }
+      var length = entries.length;
+
+      while(length!=0){
+        var loopNum = courseNum;
+        entryRows[classNum]=new Array(courseNum);
+        // 3コース以上のプールで、普通にやると1組が3人未満になってしまう場合を考慮
+        if(courseNum>3&&length/courseNum>1&&length/courseNum<2){
+          var mod = length%courseNum;
+          if(mod<=2){
+            loopNum = courseNum-(3-mod);
+          }
+        }
+        for(var i = 0; i<loopNum; i++){
+          entryRows[classNum][indexes[i]] = entries[0];
+          entries.shift();
+        }
+        classNum+=1;
+        length = entries.length;
+      }
+      return entryRows;
+  }
 
   //プログラムを追加するための入力ファイルは距離,種目名,リレーかどうかのフラグからなる
   csvFile.addEventListener("change",function(evt){
@@ -201,7 +336,7 @@ $(function(){
             addEntryData(entryObj[programTitle],entryDataObj);
           });
         });
-        //window.location.href = window.location.href;
+        window.location.href = window.location.href;
       }
     },false);
 });

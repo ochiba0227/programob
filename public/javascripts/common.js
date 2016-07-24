@@ -63,7 +63,6 @@
         entryData:entryDataObj
       }),
       success: function(msg){
-        console.log("OKOKOKOKOK")
         console.log(entryDataObj)
       }
     });

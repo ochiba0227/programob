@@ -140,7 +140,6 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
       var requestPromise = [];
       $scope.rowCollection = [];
       $.each(response.data,function(i){
-        console.log(this)
         var httpPromise = $http({
           method: 'GET',
           url: '/db/user',
