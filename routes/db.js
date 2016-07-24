@@ -4,6 +4,7 @@ var global_var = require('./var.js');
 var competition = global_var.getCompetitionModel();
 var program = global_var.getProgramModel();
 var entry = global_var.getEntryModel();
+var record = global_var.getRecordModel();
 var user = global_var.getUserModel();
 
 router.get('/', function(req, res, next) {
@@ -44,8 +45,26 @@ router.get('/entry', function(req, res, next) {
   });
 });
 router.post('/entry', function(req, res, next) {
-  var makeEntry = new entry(req.body);
-  makeEntry.save();
+  if(req.body.isRecord){
+    entry.update({_id: req.body.entryId}, {record:req.body.record}, function(err, ent) {
+      res.json({});
+    });
+  }
+  else{
+    var makeEntry = new entry(req.body);
+    makeEntry.save();
+  }
+});
+
+router.get('/record', function(req, res, next) {
+  var id = req.query.id
+  makeRecord.find({programId:id}, function(err, ent) {
+    res.json(record);
+  });
+});
+router.post('/record', function(req, res, next) {
+  var makeRecord = new record(req.body);
+  makeRecord.save();
   res.json({});
 });
 

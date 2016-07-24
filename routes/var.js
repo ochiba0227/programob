@@ -35,7 +35,7 @@ var entrySchema = new Schema({
     userId:[String],                              //ユーザIDを配列形式で格納
     entryTime:Date,                               //エントリータイム
   },
-  recordId:String,                               //recordテーブルのid
+  record:Date,                                    //実際のタイム
   createdDate : {type: Date, default: Date.now},  //作成日
   updatedDate : {type: Date, default: Date.now},  //更新日
 });

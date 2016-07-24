@@ -29,7 +29,7 @@ router.get('/program', function(req, res, next) {
 });
 
 router.get('/entry', function(req, res, next) {
-  res.render('showentry', { title: req.query.title, id:req.query.id, isRelay:req.query.isRelay});
+  res.render('entry', { title: req.query.title, id:req.query.id, isRelay:req.query.isRelay});
 });
 
 module.exports = router;

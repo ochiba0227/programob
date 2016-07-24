@@ -40,7 +40,7 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
 
 
   $scope.showEntry = function(index) {
-    var title = encodeURIComponent('No.'+index.programNum+' '+index.title);
+    var title = encodeURIComponent('No.'+index.programNum+' '+index.distance+'m '+index.title);
     var url = '/entry' + '?id=' + index._id + '&title=' + title + '&isRelay=' + index.isRelay;
     if(isAdmin){
        url = '/admin'+url;

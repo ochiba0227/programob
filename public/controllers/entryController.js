@@ -19,8 +19,8 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
       time += Number(entryTime[3]);//ミリ秒
     }
     else if(typeof entryTime[4] !== "undefined"){
-      time = Number(entryTime[2])*1000;//秒をミリ秒で
-      time += Number(entryTime[3]);//ミリ秒
+      time = Number(entryTime[4])*1000;//秒をミリ秒で
+      time += Number(entryTime[5]);//ミリ秒
     }
     //0が入力された場合
     if(Number.isNaN(time)){
@@ -37,13 +37,43 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
     return userIDList;
   }
 
+  // タイムを更新
+  $scope.updateRecord = function(index) {
+    var time = $("#time_"+index._id).val().match(/^(\d{1,3}):(\d{1,2}).(\d{1,3})$|^(\d{1,2}).(\d{1,3})$/);
+    var record = $scope.makeTime(time)
+    if(record==null){
+      $modal.open({
+        template: '<div class="md">フォーマット通りに時間を入力してください！</div>'
+      });
+      return;
+    }
+
+    //サーバへポスト
+    $http({
+      method: 'POST',
+      url: '/db/entry',
+      data: {
+        entryId:index._id,
+        record:record,
+        isRecord:true
+      }
+    }).then(function successCallback(response) {
+      $scope.showEntry();
+      $modal.open({
+        template: '<div class="md">追加が完了しました！</div>'
+      });
+    }, function errorCallback(response) {
+      alert("サーバエラーです")
+    });
+
+  }
+
   $scope.addEntry = function() {
-    console.log($scope.entryTime.match(/^(\d{1,3}):(\d{1,2}).(\d{1,3})$|^(\d{1,2}).(\d{1,3})$/))
     var time = $scope.entryTime.match(/^(\d{1,3}):(\d{1,2}).(\d{1,3})$|^(\d{1,2}).(\d{1,3})$/);
     var entryTime = $scope.makeTime(time)
     if(entryTime==null){
       $modal.open({
-        template: '<div class="md">0秒以外の時間を入力してください！</div>'
+        template: '<div class="md">フォーマット通りに時間を入力してください！</div>'
       });
       return;
     }
@@ -67,9 +97,10 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
       $scope.user = '';
       $scope.entryTime = '';
       $scope.showEntry();
-      $modal.open({
-        template: '<div class="md">追加が完了しました！</div>'
-      });
+      // $modal.open({
+      //   template: '<div class="md">追加が完了しました！</div>'
+      // });
+      alert("追加が完了しました！")
     }, function errorCallback(response) {
       alert("サーバエラーです")
     });
@@ -77,11 +108,18 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
 
   //時間のフォーマット
   $scope.formatDate = function (date) {
+    if(date==null){
+      return null;
+    }
     date = new Date(date);
     minute = (date.getHours()-9)*60 + date.getMinutes();
     second = ('0' + date.getSeconds()).slice(-2);
-    milliSecond = ('00' + date.getMilliseconds()).slice(-3);
-    return minute+':'+second+'.'+milliSecond;
+    milliSecond = (date.getMilliseconds()+'00').slice(0,3);
+
+    if(minute!=0){
+      return minute+':'+second+'.'+milliSecond;
+    }
+    return second+'.'+milliSecond;
   };
 
   //エントリーデータの取得
@@ -107,9 +145,7 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
         requestPromise.push(httpPromise);
       });
       $q.all(requestPromise).then(function() {
-        if(!isAdmin){
-          $scope.makeClass();
-        }
+        $scope.makeClass();
       });
     }, function errorCallback(response) {
       alert("サーバエラーです"+response.data)
@@ -118,6 +154,13 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
 
   //組分け
   $scope.makeClass = function() {
+    //エントリータイムが同じ場合にランダムになってしまうので、先行してid昇順ソート
+    $scope.rowCollection.sort(function(a,b){
+      if( a._id < b._id ) return -1;
+      if( a._id > b._id ) return 1;
+      return 0;
+    });
+
     //タイム昇順ソート
     $scope.rowCollection.sort(function(a,b){
       if( a.entryData.entryTime < b.entryData.entryTime ) return -1;
@@ -127,14 +170,27 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
 
     $scope.entryRows = [];
     var classNum = 0;
-    var indexes = [2,3,1,4,0,5];
+    var indexes = [];
+    var center = Math.floor($scope.courseNum/2);
+    var counter = 0;
+    for(var i = 0; i<$scope.courseNum; i++){
+      if(i%2==0){
+        indexes.push(center+counter);
+      }
+      else{
+        counter++;
+        indexes.push(center-counter);
+      }
+      console.log(indexes)
+    }
     var length = $scope.rowCollection.length;
+    console.log(length)
 
     while(length!=0){
       var loopNum = $scope.courseNum;
-      $scope.entryRows[classNum]=new Array(6);
-      // 普通にやると1組が3人未満になってしまう場合を考慮
-      if(length/$scope.courseNum>1&&length/$scope.courseNum<2){
+      $scope.entryRows[classNum]=new Array($scope.courseNum);
+      // 3コース以上のプールで、普通にやると1組が3人未満になってしまう場合を考慮
+      if($scope.courseNum>3&&length/$scope.courseNum>1&&length/$scope.courseNum<2){
         var mod = length%$scope.courseNum;
         if(mod<=2){
           loopNum = $scope.courseNum-(3-mod);
