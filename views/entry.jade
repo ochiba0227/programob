@@ -3,6 +3,7 @@ extends layout
 block content
   div(ng-app="entryApp" ng-controller="entryController" class="container")
     h2 #{title} 
+    button(class="btn btn-secondary" type="button" ng-model="showRanking" ng-click="toggleShowRanking()") ランキングに切り替え
     if isAdmin
       div(class="row")
         div(class="col-lg-12")
@@ -16,7 +17,7 @@ block content
               input(type="text" class="form-control" id="entryTime" placeholder="ex) 1:12.05" ng-model="entryTime" required)
             button(type="submit" class="btn btn-primary") エントリーを追加する
                 
-    div(class="row")
+    div(class="row" ng-if="!showRanking")
       div(class="col-lg-12")
         div(class="table-responsive" ng-repeat="rows in entryRows.slice().reverse() track by $index")
           <h5>{{$index+1}}組</h5>
@@ -32,16 +33,41 @@ block content
               tr(ng-repeat="row in rows track by $index")
                 td
                   {{$index+1}}
-                td(ng-if="row")
+                td
                   span(ng-repeat="uid in row.entryData.userData") {{uid.userName}} 
-                td(ng-if="row")
+                td
                   {{formatDate(row.entryData.entryTime)}}
                 if !isAdmin
-                  td(ng-if="row")
+                  td
                     div(class="input-group")
                       input(type="text" class="form-control" placeholder="ex) 1:12.05" id="time_{{row._id}}" value="{{formatDate(row.record)}}" ng-keyup="$event.keyCode == 13 ? updateRecord(row) : null" style="text-align: right; " required)
                       span(class="input-group-btn")
                         button(class="btn btn-secondary" type="button" ng-click="updateRecord(row)") 登録
+
+    div(class="row" ng-if="showRanking")
+      div(class="col-lg-12")
+        div(class="table-responsive")
+          table(st-table="rowCollection" style="table-layout:fixed;" class="table table-striped table-bordered table-hover")
+            thead
+              tr
+                th 順位
+                th 選手
+                th エントリータイム
+                if !isAdmin
+                  th タイム
+            tbody
+              tr(ng-repeat="row in rankingCollection track by $index")
+                td
+                  span(ng-if="formatDate(row.record)!=formatDate(rankingCollection[$index-1].record)")
+                    {{$index+1}}
+                td
+                  span(ng-repeat="uid in row.entryData.userData") {{uid.userName}} 
+                td
+                  {{formatDate(row.entryData.entryTime)}}
+                if !isAdmin
+                  td
+                    {{formatDate(row.record)}}
+
 block scripts
   script.
     var programId = "#{id}";

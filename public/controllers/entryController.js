@@ -5,8 +5,16 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
   //使用するコース数
   $scope.courseNum = 6;
 
+  $scope.showRanking = false;
+  $scope.rankingCollection = [];
+
   $scope.users = [];
   $scope.entryTime = '';
+
+  // ランキングと表示切替
+  $scope.toggleShowRanking = function(){
+    $scope.showRanking = !$scope.showRanking;
+  }
 
   $scope.makeTime = function(entryTime){
     if(entryTime==null){
@@ -145,10 +153,24 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
         requestPromise.push(httpPromise);
       });
       $q.all(requestPromise).then(function() {
+        $scope.makeRanking();
         $scope.makeClass();
       });
     }, function errorCallback(response) {
       alert("サーバエラーです"+response.data)
+    });
+  }
+
+  //ランキング作成
+  $scope.makeRanking = function() {
+    //エントリータイムが同じ場合にランダムになってしまうので、先行してid昇順ソート
+    $scope.rankingCollection = angular.copy($scope.rowCollection);
+    $scope.rankingCollection.sort(function(a,b){
+      if( typeof a.record === "undefined" ) return 1;
+      if( typeof b.record === "undefined" ) return -1;
+      if( a.record < b.record ) return -1;
+      if( a.record > b.record ) return 1;
+      return 0;
     });
   }
 
@@ -181,10 +203,8 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
         counter++;
         indexes.push(center-counter);
       }
-      console.log(indexes)
     }
     var length = $scope.rowCollection.length;
-    console.log(length)
 
     while(length!=0){
       var loopNum = $scope.courseNum;
@@ -202,7 +222,6 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
       }
       classNum+=1;
       length = $scope.rowCollection.length;
-      console.log($scope.entryRows)
     }
   }
 
