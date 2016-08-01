@@ -208,6 +208,8 @@ $(function(){
           indexes.push(center-counter);
         }
       }
+      //一時的に変更！！！！！
+      indexes = [3,4,2,5,1,6];
       var length = entries.length;
 
       while(length!=0){
@@ -325,19 +327,22 @@ $(function(){
 
           $.each(dataIndexes,function(){
             var programTitle = entryData[entryIndex][this["programTitle"]];
-            if(programTitle===""||!entryObj[programTitle]){
+            if(programTitle==null || programTitle==="" || !entryObj[programTitle]){
               // continueと等価
               return true;
             }
             var entryTime = timeStrToDate(entryData[entryIndex][this["entryTime"]]);
+            // どうやらタイムがなくても登録したいらしい。
             if(entryTime==null){
               // continueと等価
-              return true;
+              // return true;
+              entryTime = timeStrToDate("99:59.999");
             }
             var entryDataObj = {"userId":userId,"entryTime":entryTime};
             // entryDataObj["userId"] = userId;
             // entryDataObj["entryTime"] = entryTime;
             // entryObj[programTitle]["entryData"].push(entryDataObj);
+
             addEntryData(entryObj[programTitle],entryDataObj);
           });
         });
