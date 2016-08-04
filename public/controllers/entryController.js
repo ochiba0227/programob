@@ -30,7 +30,11 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
       time = Number(entryTime[4])*1000;//秒をミリ秒で
       time += Number(entryTime[5]);//ミリ秒
     }
+    else if(typeof entryTime[6] !== "undefined"){
+      time = Number(entryTime[6])*1000;//秒をミリ秒で
+    }
     //0が入力された場合
+    // 0の場合nanではないのでfalse
     if(Number.isNaN(time)){
       return null;
     }
@@ -47,7 +51,7 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
 
   // タイムを更新
   $scope.updateRecord = function(index) {
-    var time = $("#time_"+index._id).val().match(/^(\d{1,3}):(\d{1,2}).(\d{1,3})$|^(\d{1,2}).(\d{1,3})$/);
+    var time = $("#time_"+index._id).val().match(/^(\d{1,3}):(\d{1,2}).(\d{1,3})$|^(\d{1,2}).(\d{1,3})$|^(\d{1,2})$/);
     var record = $scope.makeTime(time)
     if(record==null){
       $modal.open({
@@ -77,7 +81,7 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
   }
 
   $scope.addEntry = function() {
-    var time = $scope.entryTime.match(/^(\d{1,3}):(\d{1,2}).(\d{1,3})$|^(\d{1,2}).(\d{1,3})$/);
+    var time = $scope.entryTime.match(/^(\d{1,3}):(\d{1,2}).(\d{1,3})$|^(\d{1,2}).(\d{1,3})$|^(\d{1,2})$/);
     var entryTime = $scope.makeTime(time)
     if(entryTime==null){
       $modal.open({

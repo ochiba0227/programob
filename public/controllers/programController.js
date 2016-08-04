@@ -1,6 +1,15 @@
 var programApp = angular.module('programApp', ['ui.bootstrap'])
-.controller('programController', function($scope, $modal, $http, $window) {
+.controller('programController', function($scope, $modal, $http, $window, $q) {
   $scope.rowCollection = [];
+
+  $scope.showRanking = false;
+
+  // 得点計算用
+  $scope.scoreIndividual = [8,4,1];
+  $scope.scoreRelay = [16,8,3];
+
+  // スコアを入れた辞書
+  $scope.userDict = {};
 
   $scope.competitionTitle = '';
   $scope.programTitle = '';
@@ -11,6 +20,11 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
     $event.stopPropagation();
     $scope.datePickerOpen = !$scope.datePickerOpen;
   };
+
+    // ランキングと表示切替
+    $scope.toggleShowRanking = function(){
+      $scope.showRanking = !$scope.showRanking;
+    }
 
   $scope.addProgram = function() {
     $http({
@@ -79,11 +93,126 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
       params: {id:competitionId} //req.queryにデータを渡すとき
     }).then(function successCallback(response) {
       $scope.rowCollection = response.data;
+
+      //得点ランキングの取得
+      var requestPromise = [];
+      var requestUserPromise = [];
+      $scope.entryCollection = [];
+      $.each(response.data,function(i){
+        var httpPromise = $http({
+          method: 'GET',
+          url: '/db/entry',
+          params:{id:response.data[i]._id}
+        }).then(function successCallback(responseEntry) {
+          $scope.entryCollection.push(responseEntry.data);
+        }, function errorCallback(response) {
+          alert("サーバエラーです")
+        });
+        requestPromise.push(httpPromise);
+      });
+      $q.all(requestPromise).then(function() {
+        // ユーザ名を取得する
+        $.each($scope.entryCollection,function(i){
+          $.each($scope.entryCollection[i],function(j){
+            var userPromise = $http({
+              method: 'GET',
+              url: '/db/user',
+              params: {uid:$scope.entryCollection[i][j].entryData.userId}
+            }).then(function successCallback(responseUser) {
+              $scope.entryCollection[i][j].entryData.userData = responseUser.data;
+            }, function errorCallback(response) {
+              alert("サーバエラーです")
+            });
+            requestUserPromise.push(userPromise);
+          });
+        });
+        $q.all(requestUserPromise).then(function() {
+          $scope.makeScore($scope.entryCollection);
+          // $scope.makeClass();
+        });
+      });
     }, function errorCallback(response) {
       alert("showProgramサーバエラーです"+response.data)
     });
   }
   $scope.showProgram();
+
+  //スコア作成
+  $scope.makeScore = function() {
+    // 何位まで得点をつけるかのリスト
+    var scoreIndividualLen = $scope.scoreIndividual.length;
+    var scoreRelayLen = $scope.scoreRelay.length;
+    //各エントリーを見る
+    $.each($scope.entryCollection,function(i){
+      //rowCollectionとentryCollectionの長さは同じはず
+      var mixCounter = 0;
+      var maleCounter = 0;
+      var femaleCounter = 0;
+      var programData = $scope.rowCollection[i];
+      var rankedList = $scope.getRanking($scope.entryCollection[i]);
+      //順位付けられたリストを検索し、泳いだ長さと獲得点数を取得
+      $.each(rankedList,function(j){
+        // 記録がない場合
+        if(typeof this.record === "undefined"){
+          // $.eachのcontinue
+          return true;
+        }
+        // リレーの場合
+        if(programData.isRelay){
+
+        }
+        else{
+          var userId = this.entryData.userId[0];
+          $scope.addUserDict($scope.userDict,this.entryData.userData);
+          //男女混合でのスコア
+          if(mixCounter<scoreIndividualLen){
+            $scope.userDict[userId].mixPoint = $scope.scoreIndividual[mixCounter];
+            mixCounter++;
+          }
+          //性別でのスコア
+          // 男性の場合
+          if($scope.userDict[userId].userScheme.sex==="M"){
+            if(maleCounter<scoreIndividualLen){
+              $scope.userDict[userId].sexPoint = $scope.scoreIndividual[maleCounter];
+              maleCounter++;
+            }
+          }
+          // 女性の場合
+          else{
+            if(femaleCounter<scoreIndividualLen){
+              $scope.userDict[userId].sexPoint = $scope.scoreIndividual[femaleCounter];
+              femaleCounter++;
+            }
+          }
+        }
+      });
+    });
+    console.log($scope.userDict)
+  }
+
+  // ユーザ辞書が存在すれば追加
+  $scope.addUserDict = function(userDict,userDataList) {
+    $.each(userDataList,function(i){
+      //inは第一階層しか見ないので安心
+      if(!(this.userId in userDict)){
+        userDict[this.userId] = {userScheme:this, totalDistance:0, mixPoint:0, sexPoint:0};
+      }
+    });
+  }
+
+  //ランキング作成
+  $scope.getRanking = function(rowCollection) {
+    //エントリータイムが同じ場合にランダムになってしまうので、先行してid昇順ソート
+    var rankingCollection = angular.copy(rowCollection);
+    rankingCollection.sort(function(a,b){
+      if( typeof a.record === "undefined" ) return 1;
+      if( typeof b.record === "undefined" ) return -1;
+      if( a.record < b.record ) return -1;
+      if( a.record > b.record ) return 1;
+      return 0;
+    });
+    return rankingCollection;
+  }
 });
 
 $(function(){
@@ -92,7 +221,9 @@ $(function(){
   var exportStartList = $("#exportStartList")[0];
 
   //スタートリストの出力
-  exportStartList.addEventListener("click",exportCSV);
+  if(exportStartList!=null){
+    exportStartList.addEventListener("click",exportCSV);
+  }
 
   //csvの出力
   function exportCSV(){
@@ -232,36 +363,39 @@ $(function(){
       return entryRows;
   }
 
-  //プログラムを追加するための入力ファイルは距離,種目名,リレーかどうかのフラグからなる
-  csvFile.addEventListener("change",function(evt){
-    var file = evt.target.files;
+  if(csvFile!=null){
+    //プログラムを追加するための入力ファイルは距離,種目名,リレーかどうかのフラグからなる
+    csvFile.addEventListener("change",function(evt){
+      var file = evt.target.files;
 
-    //FileReaderの作成
-    var reader = new FileReader();
-    //テキスト形式で読み込む
-    reader.readAsText(file[0]);
+      //FileReaderの作成
+      var reader = new FileReader();
+      //テキスト形式で読み込む
+      reader.readAsText(file[0]);
 
-    //読込終了後の処理
-    reader.onload = function(ev){
-      var csv = convertCSVtoArray(reader.result);
-      $.each(csv,function(){
-         $.ajax({
-            method: 'POST',
-            url: '/db/program',
-            async:false,
-            data: {
-              competitionId: competitionId,
-              title: this[1],
-              description: "",
-              distance: this[0],
-              isRelay:Boolean(Number(this[2]))
-            }
-         });
-      });
-      window.location.href = window.location.href;
-    }
-  },false);
+      //読込終了後の処理
+      reader.onload = function(ev){
+        var csv = convertCSVtoArray(reader.result);
+        $.each(csv,function(){
+           $.ajax({
+              method: 'POST',
+              url: '/db/program',
+              async:false,
+              data: {
+                competitionId: competitionId,
+                title: this[1],
+                description: "",
+                distance: this[0],
+                isRelay:Boolean(Number(this[2]))
+              }
+           });
+        });
+        window.location.href = window.location.href;
+      }
+    },false);
+  }
 
+  if(tsvFile){
     //エントリーを追加するための入力ファイルはgoogleフォームの内容からなる
     //https://docs.google.com/spreadsheets/d/1TjynES88GcLJLJmPtIMUdr38Ghy7JLEgcYjCPEo-ulQ/edit?ts=57760233#gid=2008621515
     tsvFile.addEventListener("change",function(evt){
@@ -349,4 +483,5 @@ $(function(){
         window.location.href = window.location.href;
       }
     },false);
+  }
 });
