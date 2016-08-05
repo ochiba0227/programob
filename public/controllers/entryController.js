@@ -51,7 +51,7 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
 
   // タイムを更新
   $scope.updateRecord = function(index) {
-    var time = $("#time_"+index._id).val().match(/^(\d{1,3}):(\d{1,2}).(\d{1,3})$|^(\d{1,2}).(\d{1,3})$|^(\d{1,2})$/);
+    var time = $("#time_"+index._id).val().match(/^(\d{1,3}):(\d{1,2})\.(\d{1,3})$|^(\d{1,2})\.(\d{1,3})$|^(\d{1,3})$/);
     var record = $scope.makeTime(time)
     if(record==null){
       $modal.open({
@@ -150,7 +150,7 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
     date = new Date(date);
     minute = (date.getHours()-9)*60 + date.getMinutes();
     second = ('0' + date.getSeconds()).slice(-2);
-    milliSecond = (date.getMilliseconds()+'00').slice(0,3);
+    milliSecond = ('00'+date.getMilliseconds()).slice(-3);
 
     if(minute!=0){
       return minute+':'+second+'.'+milliSecond;

@@ -97,14 +97,14 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
       //得点ランキングの取得
       var requestPromise = [];
       var requestUserPromise = [];
-      $scope.entryCollection = [];
+      $scope.entryCollection = [$scope.rowCollection.length];
       $.each(response.data,function(i){
         var httpPromise = $http({
           method: 'GET',
           url: '/db/entry',
           params:{id:response.data[i]._id}
         }).then(function successCallback(responseEntry) {
-          $scope.entryCollection.push(responseEntry.data);
+          $scope.entryCollection[i] = responseEntry.data;
         }, function errorCallback(response) {
           alert("サーバエラーです")
         });
@@ -143,11 +143,16 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
     var scoreIndividualLen = $scope.scoreIndividual.length;
     var scoreRelayLen = $scope.scoreRelay.length;
     //各エントリーを見る
+    console.log($scope.entryCollection)
+    console.log($scope.rowCollection)
     $.each($scope.entryCollection,function(i){
       //rowCollectionとentryCollectionの長さは同じはず
       var mixCounter = 0;
+      var tempMixCounter = 0;
       var maleCounter = 0;
+      var tempMaleCounter = 0;
       var femaleCounter = 0;
+      var tempFemaleCounter = 0;
       var programData = $scope.rowCollection[i];
       var rankedList = $scope.getRanking($scope.entryCollection[i]);
       //順位付けられたリストを検索し、泳いだ長さと獲得点数を取得
@@ -157,11 +162,10 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
           // $.eachのcontinueはreturn true
           return true;
         }
-        console.log(programData)
-        console.log(this)
         // リレーの場合
-        if(programData.isRelay){
+        if(programData.isRelay===true){
           // リレーのチーム人数で距離を頭割り
+          console.log(this,programData)
           var memberNum = this.entryData.userData.length;
           var mixRelayPoint = 0;
           var maleRelayPoint = 0;
@@ -169,8 +173,19 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
           //リレーのスコア
           //男女混合でのスコアのみを考慮
           if(mixCounter<scoreRelayLen){
-            mixRelayPoint += $scope.scoreRelay[mixCounter];
-            mixCounter++;
+            mixRelayPoint = $scope.scoreRelay[mixCounter];
+            // 同タイムを考慮
+            if(j+1<rankedList.length&&this.record==rankedList[j+1].record){
+              tempMixCounter++;
+            }
+            else if(tempMixCounter!=0){
+              // 最後の一人分を足しておく
+              mixCounter+=tempMixCounter+1;
+              tempMixCounter=0;
+            }
+            else{
+              mixCounter++;
+            }
           }
           $.each(this.entryData.userData,function(i){
             $scope.addUserDict($scope.userDict,this);
@@ -188,21 +203,54 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
           //男女混合でのスコア
           if(mixCounter<scoreIndividualLen){
             $scope.userDict[userId].mixPoint += $scope.scoreIndividual[mixCounter];
-            mixCounter++;
+            // 同タイムを考慮
+            if(j+1<rankedList.length&&this.record==rankedList[j+1].record){
+              tempMixCounter++;
+            }
+            else if(tempMixCounter!=0){
+              // 最後の一人分を足しておく
+              mixCounter+=tempMixCounter+1;
+              tempMixCounter=0;
+            }
+            else{
+              mixCounter++;
+            }
           }
           //性別でのスコア
           // 男性の場合
           if($scope.userDict[userId].userScheme.sex==="M"){
             if(maleCounter<scoreIndividualLen){
               $scope.userDict[userId].sexPoint += $scope.scoreIndividual[maleCounter];
-              maleCounter++;
+              // 同タイムを考慮
+              if(j+1<rankedList.length&&this.record==rankedList[j+1].record){
+                tempMaleCounter++;
+              }
+              else if(tempMaleCounter!=0){
+                // 最後の一人分を足しておく
+                maleCounter+=tempMaleCounter+1;
+                tempMaleCounter=0;
+              }
+              else{
+                maleCounter++;
+              }
             }
           }
           // 女性の場合
           else{
             if(femaleCounter<scoreIndividualLen){
               $scope.userDict[userId].sexPoint += $scope.scoreIndividual[femaleCounter];
-              femaleCounter++;
+              // 同タイムを考慮
+              if(j+1<rankedList.length&&this.record==rankedList[j+1].record){
+                tempFemaleCounter++;
+              }
+              else if(tempFemaleCounter!=0){
+                // 最後の一人分を足しておく
+                femaleCounter+=tempFemaleCounter+1;
+                tempFemaleCounter=0;
+              }
+              else{
+                femaleCounter++;
+              }
             }
           }
           // 泳いだ距離
@@ -210,7 +258,14 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
         }
       });
     });
-    console.log($scope.userDict)
+    // ng-repeatでorderbyするためにlistに詰め替え
+    $scope.userDictList = [];
+    $.each($scope.userDict,function(j){
+      this.mixSumPoint = this.mixPoint+this.mixRelayPoint;
+      this.sexSumPoint = this.sexPoint+this.sexRelayPoint;
+      $scope.userDictList.push(this);
+    });
+    $scope.showButton = true;
   }
 
   // ユーザ辞書が存在すれば追加
@@ -234,6 +289,7 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
     });
     return rankingCollection;
   }
+
 });
 
 $(function(){

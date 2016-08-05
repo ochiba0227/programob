@@ -47,6 +47,7 @@ router.get('/entry', function(req, res, next) {
 router.post('/entry', function(req, res, next) {
   if(req.body.isRecord){
     entry.update({_id: req.body.entryId}, {record:req.body.record}, function(err, ent) {
+      console.log(req.body,ent)
       res.json({});
     });
   }
