@@ -1,16 +1,16 @@
   // 現役の学年
   var activeYear = 3;
+  // 現状4年生からob
   var obStartYear = 5-activeYear;
 
 // OBならOB何年目か、現役なら現役何年目か返す
 function getOBYear(date) {
-  var thisYear = getJSTDate(new Date());
   var graduateYear = new Date(date);
 
   var retText;
   var yearNum;
 // console.log(thisYear.getFullYear(),graduateYear.getFullYear());
-  if(isOB(thisYear,graduateYear)){
+  if(isOB(graduateYear)){
     yearNum = thisYear.getFullYear() - graduateYear.getFullYear() + obStartYear;
     retText = "OB " + yearNum.toString();
   }
@@ -24,8 +24,9 @@ function getOBYear(date) {
 }
 
 // OBかどうか判定する
-function isOB(thisYear,graduateYear) {
+function isOB(graduateYear) {
   // 3年生までが現役？
+  var thisYear = getJSTDate(new Date());
   if(thisYear.getFullYear()+obStartYear-1<graduateYear.getFullYear()){
     return false;
   }

@@ -2,6 +2,11 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
 .controller('entryController', function($scope, $modal, $http, $window, $q) {
   $scope.rowCollection = [];
 
+  $scope.isRelay = isRelay;
+  $scope.isObFlg = false;
+
+  $scope.departments = ['M','E','S','I','C'];
+
   //使用するコース数
   $scope.courseNum = 6;
 
@@ -104,6 +109,30 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
       });
     }
 
+    // エントリーを削除
+    $scope.deleteEntry = function(index,courseNum) {
+       var myRet = confirm(courseNum + "コースのエントリーを削除してよろしいですか？");
+       if ( myRet == false ){
+           return;
+       }
+      //サーバへポスト
+      $http({
+        method: 'POST',
+        url: '/db/entry',
+        data: {
+          entryId:index._id,
+          deleteEntry:true
+        }
+      }).then(function successCallback(response) {
+        $scope.showEntry();
+        $modal.open({
+          template: '<div class="md">削除が完了しました！</div>'
+        });
+      }, function errorCallback(response) {
+        alert("サーバエラーです")
+      });
+    }
+
   $scope.addEntry = function() {
     var time = $scope.entryTime.match(/^(\d{1,3}):(\d{1,2}).(\d{1,3})$|^(\d{1,2}).(\d{1,3})$|^(\d{1,2})$/);
     var entryTime = $scope.makeTime(time)
@@ -113,7 +142,6 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
       });
       return;
     }
-
     //リレーでなく人数が1人以上の場合
     if(!isRelay&&$scope.user.length!=1){
       $modal.open({
@@ -121,17 +149,18 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
       });
       return;
     }
-
     $http({
       method: 'POST',
       url: '/db/entry',
       data: {
         programId:programId,
-        entryData:{userId:$scope.makeUserID($scope.user),entryTime:entryTime}
+        entryData:{userId:$scope.makeUserID($scope.user),entryTime:entryTime,isObFlg:$scope.isObFlg,department:$scope.department}
       }
     }).then(function successCallback(response) {
       $scope.user = '';
       $scope.entryTime = '';
+      $scope.department = '';
+      $scope.isObFlg = false;
       $scope.showEntry();
       // $modal.open({
       //   template: '<div class="md">追加が完了しました！</div>'

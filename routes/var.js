@@ -34,6 +34,8 @@ var entrySchema = new Schema({
   entryData : {                                   //エントリーデータをjson形式で格納
     userId:[String],                              //ユーザIDを配列形式で格納
     entryTime:Date,                               //エントリータイム
+    isObFlg:Boolean,                              //obチームであるかどうかを示すフラグリレーのためにやむなし追加
+    department : String                           //学科(M,E,S,I,C)リレーのためにやむなし追加
   },
   record:Date,                                    //実際のタイム
   createdDate : {type: Date, default: Date.now},  //作成日

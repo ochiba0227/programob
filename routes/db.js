@@ -51,6 +51,13 @@ router.post('/entry', function(req, res, next) {
       res.json({});
     });
   }
+  else if(req.body.deleteEntry){
+    // エントリー消す処理！！！！！！！！！！！！！！！！！！！
+    entry.find({_id: req.body.entryId}).remove(function(err, ent) {
+      console.log("delendelen",req.body)
+      res.json({});
+    });
+  }
   else{
     console.log(req.body)
     var makeEntry = new entry(req.body);

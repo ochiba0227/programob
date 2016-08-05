@@ -10,11 +10,19 @@ block content
           form(id="entryForm" ng-submit="addEntry()")
             div(class="form-group" id="userName")
               label(for="user") ユーザ名
-              select(class="form-control selectpicker" multiple id="user" ng-model="user" ng-options="u.userName for u in users" required)
+              input(ng-model="filterUser")
+              select(class="form-control selectpicker" multiple id="user" ng-model="user" ng-options="u.userName for u in users|filter:filterUser" required)
                 option(value="") -選択してください-
             div(class="form-group")
               label(for="entryTime") エントリータイム
               input(type="text" class="form-control" id="entryTime" placeholder="ex) 1:12.05" ng-model="entryTime" required)
+            div(class="form-group" ng-if="isRelay")
+              label(for="department") 学科対抗なら学科を選択
+              select(class="form-control" id="department" ng-model="$parent.department" ng-options="d for d in departments")
+                option(value="") -選択してください-
+            div(class="form-group" ng-if="isRelay")
+              label(for="isObFlg") OBチームならチェック
+              input(type="checkbox" class="form-control" id="isObFlg" ng-model="$parent.isObFlg")
             button(type="submit" class="btn btn-primary") エントリーを追加する
                 
     div(class="row" ng-if="!showRanking")
@@ -26,16 +34,28 @@ block content
               tr
                 th コース
                 th 選手
+                if isRelay
+                  th チーム
+                else
+                  th 学年
                 th エントリータイム
                 if !isAdmin
                   th タイム
                   th タイムの削除
+                if isAdmin
+                  th エントリーの削除
             tbody
               tr(ng-repeat="row in rows track by $index")
                 td
                   {{$index+1}}
                 td
                   span(ng-repeat="uid in row.entryData.userData") {{uid.userName}} 
+                td
+                  div(ng-show="row.entryData.entryTime")
+                    span {{row.entryData.department}}チーム
+                    div(ng-show="!row.entryData.department")
+                      span(ng-if="row.entryData.isObFlg") OBチーム
+                      span(ng-if="!row.entryData.isObFlg") 現役チーム
                 td
                   {{formatDate(row.entryData.entryTime)}}
                 if !isAdmin
@@ -46,7 +66,11 @@ block content
                         button(class="btn btn-secondary" type="button" ng-click="updateRecord(row)") 登録
                   td
                     button(class="btn btn-danger" type="button" ng-click="deleteRecord(row,$index+1)" style="width:100%") 削除
-
+                if isAdmin
+                  td
+                    div(ng-show="row.entryData.entryTime")
+                      button(class="btn btn-danger" type="button" ng-click="deleteEntry(row,$index+1)" style="width:100%") 削除
+                  
     div(class="row" ng-if="showRanking")
       div(class="col-lg-12")
         div(class="table-responsive")

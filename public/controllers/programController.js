@@ -4,6 +4,17 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
 
   $scope.showRanking = false;
 
+  // 得点
+  $scope.obScore = 0;
+  $scope.activeScore = 0;
+
+  // 学科ごとの得点
+  $scope.mScore = 0;
+  $scope.eScore = 0;
+  $scope.sScore = 0;
+  $scope.iScore = 0;
+  $scope.cScore = 0;
+
   // 得点計算用
   $scope.scoreIndividual = [8,4,1];
   $scope.scoreRelay = [16,8,3];
@@ -165,7 +176,6 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
         // リレーの場合
         if(programData.isRelay===true){
           // リレーのチーム人数で距離を頭割り
-          console.log(this,programData)
           var memberNum = this.entryData.userData.length;
           var mixRelayPoint = 0;
           var maleRelayPoint = 0;
@@ -174,6 +184,33 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
           //男女混合でのスコアのみを考慮
           if(mixCounter<scoreRelayLen){
             mixRelayPoint = $scope.scoreRelay[mixCounter];
+            // OB、現役としてのスコア
+            //obチームの場合
+            if(this.entryData.isObFlg){
+              $scope.obScore += mixRelayPoint;
+            }
+            else{
+              $scope.activeScore += mixRelayPoint;
+            }
+
+            // 学科としてのスコア
+            var department = this.entryData.department;
+            if(department==="M"){
+              $scope.mScore += mixRelayPoint;
+            }
+            else if(department==="E"){
+              $scope.eScore += mixRelayPoint;
+            }
+            else if(department==="S"){
+              $scope.sScore += mixRelayPoint;
+            }
+            else if(department==="I"){
+              $scope.iScore += mixRelayPoint;
+            }
+            else if(department==="C"){
+              $scope.cScore += mixRelayPoint;
+            }
+
             // 同タイムを考慮
             if(j+1<rankedList.length&&this.record==rankedList[j+1].record){
               tempMixCounter++;
@@ -194,7 +231,6 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
             // 泳いだ距離
             $scope.userDict[this.userId].totalDistance += programData.distance/memberNum;
           });
-          // 個人の貢献度はこれでよいが現役、OBの合計得点計算はしていない！！！！！！！！！！！！！！！！！！！
         }
         // 個人の場合
         else{
@@ -202,7 +238,34 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
           $scope.addUserDict($scope.userDict,this.entryData.userData[0]);
           //男女混合でのスコア
           if(mixCounter<scoreIndividualLen){
+            // 個人のスコア
             $scope.userDict[userId].mixPoint += $scope.scoreIndividual[mixCounter];
+            // OB、現役としてのスコア
+            if(isOB(new Date(this.entryData.userData[0].graduateYear))){
+              $scope.obScore += $scope.scoreIndividual[mixCounter];
+            }
+            else{
+              $scope.activeScore += $scope.scoreIndividual[mixCounter];
+            }
+
+            // 学科としてのスコア
+            var department=this.entryData.userData[0].department;
+            if(department==="M"){
+              $scope.mScore += $scope.scoreIndividual[mixCounter];
+            }
+            else if(department==="E"){
+              $scope.eScore += $scope.scoreIndividual[mixCounter];
+            }
+            else if(department==="S"){
+              $scope.sScore += $scope.scoreIndividual[mixCounter];
+            }
+            else if(department==="I"){
+              $scope.iScore += $scope.scoreIndividual[mixCounter];
+            }
+            else if(department==="C"){
+              $scope.cScore += $scope.scoreIndividual[mixCounter];
+            }
+
             // 同タイムを考慮
             if(j+1<rankedList.length&&this.record==rankedList[j+1].record){
               tempMixCounter++;
