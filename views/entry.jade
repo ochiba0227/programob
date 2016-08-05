@@ -29,6 +29,7 @@ block content
                 th エントリータイム
                 if !isAdmin
                   th タイム
+                  th タイムの削除
             tbody
               tr(ng-repeat="row in rows track by $index")
                 td
@@ -43,6 +44,8 @@ block content
                       input(type="text" class="form-control" placeholder="ex) 1:12.05" id="time_{{row._id}}" value="{{formatDate(row.record)}}" ng-keyup="$event.keyCode == 13 ? updateRecord(row) : null" style="text-align: right; " required)
                       span(class="input-group-btn")
                         button(class="btn btn-secondary" type="button" ng-click="updateRecord(row)") 登録
+                  td
+                    button(class="btn btn-danger" type="button" ng-click="deleteRecord(row,$index+1)" style="width:100%") 削除
 
     div(class="row" ng-if="showRanking")
       div(class="col-lg-12")

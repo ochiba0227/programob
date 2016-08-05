@@ -92,7 +92,19 @@ router.get('/user', function(req, res, next) {
     });
   }
   else if(uid!=null){
-    user.find({userId:uid}, function(err, usr) {
+    console.log(uid)
+      var query = null;
+      if(Array.isArray(uid)){
+        var queryId = []
+        uid.forEach(function(i){
+          queryId.push({userId:i});
+        });
+        query = { $or: queryId };
+      }
+      else{
+        query = {userId:uid}
+      }
+    user.find(query, function(err, usr) {
       res.json(usr);
     });
   }

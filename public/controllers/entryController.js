@@ -44,7 +44,7 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
   $scope.makeUserID = function(users){
     var userIDList=[];
     $.each(users,function(){
-      userIDList.push(this._id);
+      userIDList.push(this.userId);
     });
     return userIDList;
   }
@@ -77,8 +77,32 @@ var entryApp = angular.module('entryApp', ['ui.bootstrap'])
     }, function errorCallback(response) {
       alert("サーバエラーです")
     });
-
   }
+
+    // タイムを削除
+    $scope.deleteRecord = function(index,courseNum) {
+       var myRet = confirm(courseNum + "コースのタイムを削除してよろしいですか？");
+       if ( myRet == false ){
+           return;
+       }
+      //サーバへポスト
+      $http({
+        method: 'POST',
+        url: '/db/entry',
+        data: {
+          entryId:index._id,
+          record:undefined,
+          isRecord:true
+        }
+      }).then(function successCallback(response) {
+        $scope.showEntry();
+        $modal.open({
+          template: '<div class="md">削除が完了しました！</div>'
+        });
+      }, function errorCallback(response) {
+        alert("サーバエラーです")
+      });
+    }
 
   $scope.addEntry = function() {
     var time = $scope.entryTime.match(/^(\d{1,3}):(\d{1,2}).(\d{1,3})$|^(\d{1,2}).(\d{1,3})$|^(\d{1,2})$/);

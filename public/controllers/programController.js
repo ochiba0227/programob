@@ -153,37 +153,60 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
       //順位付けられたリストを検索し、泳いだ長さと獲得点数を取得
       $.each(rankedList,function(j){
         // 記録がない場合
-        if(typeof this.record === "undefined"){
-          // $.eachのcontinue
+        if(typeof this.record === "undefined" || this.record == null){
+          // $.eachのcontinueはreturn true
           return true;
         }
+        console.log(programData)
+        console.log(this)
         // リレーの場合
         if(programData.isRelay){
-
+          // リレーのチーム人数で距離を頭割り
+          var memberNum = this.entryData.userData.length;
+          var mixRelayPoint = 0;
+          var maleRelayPoint = 0;
+          var femaleRelayPoint = 0;
+          //リレーのスコア
+          //男女混合でのスコアのみを考慮
+          if(mixCounter<scoreRelayLen){
+            mixRelayPoint += $scope.scoreRelay[mixCounter];
+            mixCounter++;
+          }
+          $.each(this.entryData.userData,function(i){
+            $scope.addUserDict($scope.userDict,this);
+            // リレーで獲得した得点
+            $scope.userDict[this.userId].mixRelayPoint += mixRelayPoint;
+            // 泳いだ距離
+            $scope.userDict[this.userId].totalDistance += programData.distance/memberNum;
+          });
+          // 個人の貢献度はこれでよいが現役、OBの合計得点計算はしていない！！！！！！！！！！！！！！！！！！！
         }
+        // 個人の場合
         else{
           var userId = this.entryData.userId[0];
-          $scope.addUserDict($scope.userDict,this.entryData.userData);
+          $scope.addUserDict($scope.userDict,this.entryData.userData[0]);
           //男女混合でのスコア
           if(mixCounter<scoreIndividualLen){
-            $scope.userDict[userId].mixPoint = $scope.scoreIndividual[mixCounter];
+            $scope.userDict[userId].mixPoint += $scope.scoreIndividual[mixCounter];
             mixCounter++;
           }
           //性別でのスコア
           // 男性の場合
           if($scope.userDict[userId].userScheme.sex==="M"){
             if(maleCounter<scoreIndividualLen){
-              $scope.userDict[userId].sexPoint = $scope.scoreIndividual[maleCounter];
+              $scope.userDict[userId].sexPoint += $scope.scoreIndividual[maleCounter];
               maleCounter++;
             }
           }
           // 女性の場合
           else{
             if(femaleCounter<scoreIndividualLen){
-              $scope.userDict[userId].sexPoint = $scope.scoreIndividual[femaleCounter];
+              $scope.userDict[userId].sexPoint += $scope.scoreIndividual[femaleCounter];
               femaleCounter++;
             }
           }
+          // 泳いだ距離
+          $scope.userDict[userId].totalDistance += programData.distance;
         }
       });
     });
@@ -191,13 +214,11 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
   }
 
   // ユーザ辞書が存在すれば追加
-  $scope.addUserDict = function(userDict,userDataList) {
-    $.each(userDataList,function(i){
-      //inは第一階層しか見ないので安心
-      if(!(this.userId in userDict)){
-        userDict[this.userId] = {userScheme:this, totalDistance:0, mixPoint:0, sexPoint:0};
-      }
-    });
+  $scope.addUserDict = function(userDict,userData) {
+    //inは第一階層しか見ないので安心
+    if(!(userData.userId in userDict)){
+      userDict[userData.userId] = {userScheme:userData, totalDistance:0, mixPoint:0, sexPoint:0, mixRelayPoint:0, sexRelayPoint:0};
+    }
   }
 
   //ランキング作成
