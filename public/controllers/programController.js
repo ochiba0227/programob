@@ -16,8 +16,8 @@ var programApp = angular.module('programApp', ['ui.bootstrap'])
   $scope.cScore = 0;
 
   // 得点計算用
-  $scope.scoreIndividual = [8,4,1];
-  $scope.scoreRelay = [16,8,3];
+  $scope.scoreIndividual = [5,4,3,2,1];
+  $scope.scoreRelay = [20,16,12];
 
   // スコアを入れた辞書
   $scope.userDict = {};

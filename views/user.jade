@@ -7,10 +7,13 @@ block content
       div(class="col-lg-12")
         form(id="userForm" ng-submit="addUser()")
           div(class="form-group")
+            label(for="userId") ユーザID
+            input(type="number" class="form-control" id="userId" ng-model="userId" required)
+          div(class="form-group")
             label(for="userName") ユーザ名
             input(type="text" class="form-control" id="userName" ng-model="userName" required)
           div(class="form-group")
-            label(for="department") 性別
+            label(for="sex") 性別
             select(class="form-control" id="sex" ng-model="sex" ng-options="s for s in sexList" required)
               option(value="") -選択してください-
           div(class="form-group")
@@ -37,7 +40,7 @@ block content
                 th 学科
                 th 卒業（見込み）年度
             tbody
-              tr(ng-repeat="row in rowCollection| filter:filter")
+              tr(ng-repeat="row in rowCollection| filter:filter" ng-click="showModModal(row)")
                 td {{row.userId}}
                 td {{row.userName}}
                 td {{row.sex}}

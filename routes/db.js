@@ -122,10 +122,21 @@ router.get('/user', function(req, res, next) {
     });
   }
 });
+// ユーザ関係！！！！！！！！！！ID重複チェックはつけたい！！！！！！！！！！！！！！
 router.post('/user', function(req, res, next) {
-  var makeUser = new user(req.body);
-  makeUser.save();
-  res.json({});
+  // ユーザの更新
+  if(req.body.isUpdate){
+    user.update({_id: req.body._id}, req.body, function(err, ent) {
+      console.log(req.body,ent)
+      res.json({});
+    });
+  }
+  // ユーザの追加
+  else{
+    var makeUser = new user(req.body);
+    makeUser.save();
+    res.json({});
+  }
 });
 
 module.exports = router;
